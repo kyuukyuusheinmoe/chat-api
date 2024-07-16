@@ -50,6 +50,32 @@ export class AuthService {
         }
         
       }
+
+    
+
+    async register(userData: UserDto):Promise<{ status: number; message: string;data?:any, token?: string }>  {
+      const existingUser = await this.prismaService.user.findFirst({
+        where: {
+           email: userData.email
+        },
+      });
+      try {
+        if (existingUser) {
+          return { status: 400, message: 'User already exists' };
+        }
+    
+        const newUser = await this.prismaService.user.create({
+          data: userData,
+        });
+    
+        const token = await this.jwtAuthService.createToken({ id: newUser.id, email: newUser.email, name: newUser.name });
+        return { status: 201, message: 'User created successfully', token };
+      } catch (error) {
+        return { status: 500, message: 'Error registering user' };
+      }
+    }
+    
+
     async gg_login(code: string): Promise<{ status: number; message: string; token?: string; data?: Prisma.UserCreateInput }>{
         try {
             const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
