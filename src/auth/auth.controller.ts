@@ -28,6 +28,21 @@ export class AuthController {
     };
   }
 
+  @Post("/auth/login")
+  async login(@Body() userData: UserDto,) {
+    const result = await this.authService.login(userData);
+    
+    if (result.status !== 200) {
+      throw new HttpException(result.message, result.status);
+    }
+
+    return {
+      statusCode: result.status,
+      message: result.message,
+      token: result.token
+    };
+  }
+
   @Get('/auth/login/google')
   async gg_login(@Query('code') code: string,) {
     const result = await this.authService.gg_login(code);

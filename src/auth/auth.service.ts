@@ -51,8 +51,6 @@ export class AuthService {
         
       }
 
-    
-
     async register(userData: UserDto):Promise<{ status: number; message: string;data?:any, token?: string }>  {
       const existingUser = await this.prismaService.user.findFirst({
         where: {
@@ -124,7 +122,26 @@ export class AuthService {
         }
     }
 
-    login(): string {
-        return 'Hello World!';
+    async login(userData: UserDto):Promise<{ status: number; message: string;data?:any, token?: string }>  {
+      
+      if (!userData.email) {
+        return { status: 500, message: 'Error logging in' };
+      }
+
+      const existingUser = await this.prismaService.user.findFirst({
+        where: {
+           email: userData.email
+        },
+      });
+      try {
+        if (!existingUser) {
+          return { status: 400, message: 'User does not exist' };
+        }
+
+        const token = await this.jwtAuthService.createToken({ id: existingUser.id, email: existingUser.email, name: existingUser.name });
+        return { status: 200, message: 'Loggedin successfully', token };
+      } catch (error) {
+        return { status: 500, message: 'Error logging in' };
+      }
     }
 }
