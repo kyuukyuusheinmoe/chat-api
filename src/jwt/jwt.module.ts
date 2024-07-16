@@ -11,5 +11,6 @@ import { JwtAuthService } from './jwt.servic';
     }),
   ],
   providers: [JwtAuthService, JwtStrategy],
+  exports: [JwtAuthService],
 })
 export class JwtAuthModule {}
