@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body, HttpException } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { UserDto } from './auth.dto';
 
 @Controller()
 export class AuthController {
@@ -11,8 +12,19 @@ export class AuthController {
         return this.authService.list();
     }
 
-  @Post('register')
-  register(): string {
-    return this.authService.register();
+  @Post('/auth/login/google')
+  async gg_login(@Body() createUserDto: UserDto) {
+    const result = await this.authService.gg_login(createUserDto);
+    
+    if (result.status !== 201) {
+      throw new HttpException(result.message, result.status);
+    }
+
+    return {
+      statusCode: result.status,
+      message: result.message,
+      data: result.data,
+    };
   }
 }
+
