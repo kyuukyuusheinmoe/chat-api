@@ -7,12 +7,13 @@ import { UserModule } from './users/user.module';
 import { UserMiddleware } from './middlewares/user.middleware';
 import { JwtAuthService } from './jwt/jwt.servic';
 import { JwtModule } from '@nestjs/jwt';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [ AuthModule, UserModule, JwtModule.register({
     secret: 'my-chat-api',
     signOptions: { expiresIn: '1h' },
-  }),],
+  }), GroupModule,],
   controllers: [AppController],
   providers: [AppService, JwtAuthService],
 })
@@ -20,6 +21,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(UserMiddleware)
-      .forRoutes('users');
+      .forRoutes('users', 'group', "users/add-friend");
   }
 }
