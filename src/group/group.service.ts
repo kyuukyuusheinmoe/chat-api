@@ -11,17 +11,26 @@ export class GroupService {
     private readonly userService: UserService,
   ) {}
 
-  async create(user: UserDto, groupData: GroupDto) {
+  async create(
+    user: UserDto,
+    groupData: GroupDto,
+  ): Promise<{ status: number; message: string; data?: any; token?: string }> {
     try {
       const userData = await this.prismaService.user.findFirst({
         where: { id: user.id },
         include: { friendList: true },
       });
-      const isAlreadyFriend = userData.friendList.some(
-        (friend) => friend.id === groupData?.members,
-      );
+      let isAlreadyFriend: boolean;
 
-      console.log ('xxx isAlreadyFriend ', isAlreadyFriend, userData)
+      groupData?.members?.forEach((member: number) => {
+        const existedMember = userData.friendList.find(
+          (friend) => friend.id === member,
+        );
+        if (existedMember) {
+          isAlreadyFriend = true;
+          return;
+        }
+      });
 
       //If no friend already, add friend first
       if (!isAlreadyFriend) {
@@ -30,30 +39,55 @@ export class GroupService {
           groupData.members?.[0],
         );
 
-      console.log ('xxx add FriendResult ', result)
-
-        //After add friend success, create group chat with
-        if (result.status === 200) {
-          const group = await this.prismaService.group.create({
-            data: {
-              name: groupData.name,
-              createdAt: new Date(),
-              members: {
-                connect: [...groupData.members, user.id].map((id) => ({ id })),
-              },
-            },
-          });
-          return {
-            status: 201,
-            message: 'Group created successfully',
-            data: group,
-          };
+        if (result.status === 500) {
+          return { status: 500, message: 'Error creating group' };
         }
-        return { status: 500, message: 'Error creating group' };
       }
+
+      const groupResult = await this.checkGroup(user, groupData);
+
+      return groupResult;
     } catch (error) {
       console.log('xxx error ', error);
       return { status: 500, message: 'Error creating group' };
+    }
+  }
+
+  async checkGroup(user, groupData) {
+    const existedGroup = await this.prismaService.group.findFirst({
+      where: {
+        members: {
+          some: {
+            id: user.id,
+          },
+        },
+      },
+      include: { members: true },
+    });
+
+    if (!existedGroup) {
+      const group = await this.prismaService.group.create({
+        data: {
+          name: groupData.name,
+          createdAt: new Date(),
+          members: {
+            connect: [...groupData.members, user.id].map((id) => ({
+              id,
+            })),
+          },
+        },
+      });
+      return {
+        status: 201,
+        message: 'Group created successfully',
+        data: group,
+      };
+    } else {
+      return {
+        status: 201,
+        message: 'Group created successfully',
+        data: existedGroup,
+      };
     }
   }
 
