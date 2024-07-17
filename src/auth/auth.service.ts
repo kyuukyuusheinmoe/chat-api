@@ -5,11 +5,14 @@ import { JwtAuthService } from 'src/jwt/jwt.servic';
 import { UserDto } from './auth.dto';
 import { Prisma } from '@prisma/client';
 import { OAuth2Client } from "google-auth-library";
+import { PasswordService } from 'src/password.service';
 
 @Injectable()
 export class AuthService {
     constructor(private readonly prismaService: PrismaService,     
         private jwtAuthService: JwtAuthService,
+        private passwordService: PasswordService,
+
     ) {}
 
     async list(
@@ -52,6 +55,7 @@ export class AuthService {
       }
 
     async register(userData: UserDto):Promise<{ status: number; message: string;data?:any, token?: string }>  {
+      console.log ('xxx userData ', userData)
       const existingUser = await this.prismaService.user.findFirst({
         where: {
            email: userData.email
@@ -62,13 +66,15 @@ export class AuthService {
           return { status: 400, message: 'User already exists' };
         }
     
+        const password = await this.passwordService.hashPassword(userData.password)
         const newUser = await this.prismaService.user.create({
-          data: userData,
+          data: {...userData, password:password },
         });
     
         const token = await this.jwtAuthService.createToken({ id: newUser.id, email: newUser.email, name: newUser.name });
-        return { status: 201, message: 'User created successfully', token };
+        return { status: 201, message: 'User created successfully', data: newUser, token };
       } catch (error) {
+        console.log ("xxx error ", error)
         return { status: 500, message: 'Error registering user' };
       }
     }
