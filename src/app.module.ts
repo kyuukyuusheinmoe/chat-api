@@ -8,6 +8,7 @@ import { UserMiddleware } from './middlewares/user.middleware';
 import { JwtAuthService } from './jwt/jwt.servic';
 import { JwtModule } from '@nestjs/jwt';
 import { GroupModule } from './group/group.module';
+import { ChatGateway } from './chat/chat.gateway';
 
 @Module({
   imports: [ AuthModule, UserModule, JwtModule.register({
@@ -15,7 +16,7 @@ import { GroupModule } from './group/group.module';
     signOptions: { expiresIn: '1h' },
   }), GroupModule,],
   controllers: [AppController],
-  providers: [AppService, JwtAuthService],
+  providers: [AppService, JwtAuthService, ChatGateway],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
