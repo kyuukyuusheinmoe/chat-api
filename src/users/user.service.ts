@@ -1,16 +1,16 @@
-import { Injectable, Query } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserDto } from 'src/auth/auth.dto';
 import { PrismaService } from 'src/prisma.service';
-
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
   async getUsers(
-    @Query('searchString') searchString?: string,
-    @Query('take') take?: number,
-    @Query('skip') skip?: number,
+    user: UserDto,
+    searchString: string,
+    take?: number,
+    skip?: number,
   ): Promise<{ status: number; data: any[] }> {
-    console.log('xxx searchString ', searchString);
+    console.log('xxx searchString user in function', searchString, user);
     try {
       const conditionOR = searchString
         ? {
