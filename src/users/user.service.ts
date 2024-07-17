@@ -21,7 +21,12 @@ export class UserService {
           }
         : {};
       const users = await this.prismaService.user.findMany({
-        where: { ...conditionOR },
+        where: {
+          ...conditionOR,
+          NOT: {
+            email: user.email,
+          },
+        },
         take: Number(take) || undefined,
         skip: Number(skip) || undefined,
       });

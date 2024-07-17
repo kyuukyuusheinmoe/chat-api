@@ -20,25 +20,29 @@ export class UserController {
     @Query('take') take?: number,
     @Query('skip') skip?: number,
   ) {
-    const user = req['user'];
-    if (!user) {
-      throw new UnauthorizedException('Authorization Failed');
+    try {
+      const user = req['user'];
+      if (!user) {
+        throw new UnauthorizedException('Authorization Failed');
+      }
+
+      const result = await this.userService.getUsers(
+        user,
+        searchString,
+        take,
+        skip,
+      );
+
+      if (result.status !== 200) {
+        throw new HttpException('Error fetching Data', result.status);
+      }
+
+      return {
+        statusCode: result.status,
+        data: result.data,
+      };
+    } catch (error) {
+      throw new HttpException('Authorization Failed', 401);
     }
-
-    const result = await this.userService.getUsers(
-      user,
-      searchString,
-      take,
-      skip,
-    );
-
-    if (result.status !== 200) {
-      throw new HttpException('Error fetching Data', result.status);
-    }
-
-    return {
-      statusCode: result.status,
-      data: result.data,
-    };
   }
 }
