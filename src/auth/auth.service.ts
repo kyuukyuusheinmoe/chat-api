@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, Query } from '@nestjs/common';
+import { Injectable,  } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { JwtAuthService } from 'src/jwt/jwt.servic';
 import { UserDto } from './auth.dto';
@@ -14,45 +14,6 @@ export class AuthService {
         private passwordService: PasswordService,
 
     ) {}
-
-    async list(
-        // @Query('take') take?: number,
-        // @Query('skip') skip?: number,
-        // @Query('searchString') searchString?: string,
-        // @Query('orderBy') orderBy?: 'asc' | 'desc',
-       
-      ): Promise<any[]> {
-        try {
-            // const or = searchString
-        //   ? {
-        //       OR: [
-        //         { title: { contains: searchString } },
-        //         { content: { contains: searchString } },
-        //       ],
-        //     }
-        //   : {}
-    
-        const users =  this.prismaService.user.findMany({
-            //   where: {
-            //     published: true,
-            //     ...or,
-            //   },
-            //   include: { author: true },
-            //   take: Number(take) || undefined,
-            //   skip: Number(skip) || undefined,
-            //   orderBy: {
-            //     updatedAt: orderBy,
-            //   },
-            })
-            console.log ("xxx list out user ")
-    
-            return users;
-        } catch (error) {
-            console.log ("xxx error  ", error)
-            
-        }
-        
-      }
 
     async register(userData: UserDto):Promise<{ status: number; message: string;data?:any, token?: string }>  {
       console.log ('xxx userData ', userData)
