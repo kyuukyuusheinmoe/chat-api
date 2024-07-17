@@ -10,7 +10,6 @@ export class UserService {
     take?: number,
     skip?: number,
   ): Promise<{ status: number; data: any[] }> {
-    console.log('xxx searchString user in function', searchString, user);
     try {
       const conditionOR = searchString
         ? {
@@ -35,6 +34,25 @@ export class UserService {
       return { status: 200, data: users };
     } catch (error) {
       console.log('xxx error  ', error);
+    }
+  }
+
+  async addFriend(user: UserDto, friendId: number) {
+    try {
+      const updatedUser = await this.prismaService.user.update({
+        where: { id: user.id },
+        data: {
+          friendList: {
+            connect: { id: friendId },
+          },
+        },
+        include: {
+          friendList: true,
+        },
+      });
+      return { status: 200, data: updatedUser };
+    } catch (error) {
+      console.log('Error adding friend:', error);
     }
   }
 }

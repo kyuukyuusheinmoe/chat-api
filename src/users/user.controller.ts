@@ -1,7 +1,9 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
+  Patch,
   Query,
   Req,
   UnauthorizedException,
@@ -35,6 +37,33 @@ export class UserController {
 
       if (result.status !== 200) {
         throw new HttpException('Error fetching Data', result.status);
+      }
+
+      return {
+        statusCode: result.status,
+        data: result.data,
+      };
+    } catch (error) {
+      throw new HttpException('Authorization Failed', 401);
+    }
+  }
+
+  @Patch('add-friend')
+  async addFriend(@Req() req: Request, @Body() friendId: number) {
+    try {
+      const user = req['user'];
+      if (!user) {
+        throw new UnauthorizedException('Authorization Failed');
+      }
+
+      if (isNaN(user.id) || isNaN(friendId)) {
+        throw new HttpException('Invalid userId or friendId', 400);
+      }
+
+      const result = await this.userService.addFriend(user, friendId);
+
+      if (result.status !== 200) {
+        throw new HttpException('Error adding friend', result.status);
       }
 
       return {
