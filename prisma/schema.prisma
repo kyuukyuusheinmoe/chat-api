@@ -13,6 +13,8 @@ model User {
   name     String?
   provider OAuthProvider
   password String?
+  friends  User[]        @relation("Friendship")
+  friendOf User[]        @relation("Friendship")
 }
 
 enum OAuthProvider {
