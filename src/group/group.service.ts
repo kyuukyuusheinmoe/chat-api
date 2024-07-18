@@ -114,6 +114,7 @@ export class GroupService {
             },
           },
         },
+        include: { members: true },
       });
       return {
         status: 200,
