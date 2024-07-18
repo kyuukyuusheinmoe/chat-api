@@ -1,4 +1,4 @@
-import { Injectable, Param } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { MessageDto } from './message.dto';
 import { PrismaService } from 'src/prisma.service';
 import { UserDto } from 'src/auth/auth.dto';
