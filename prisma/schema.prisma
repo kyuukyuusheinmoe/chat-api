@@ -17,6 +17,7 @@ model User {
   groupId    Int?
   friendList User[]        @relation("UserFriends")
   friends    User[]        @relation("UserFriends")
+  Message    Message[]
 }
 
 enum OAuthProvider {
@@ -25,8 +26,19 @@ enum OAuthProvider {
 }
 
 model Group {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
   members   User[]
+  Message   Message[]
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  groupId   Int
+  Group     Group    @relation(fields: [groupId], references: [id])
+  senderId  Int
+  Sender    User     @relation(fields: [senderId], references: [id])
 }
