@@ -104,8 +104,25 @@ export class GroupService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} group`;
+  async findGroupById(userData: UserDto) {
+    try {
+      const groups = await this.prismaService.group.findMany({
+        where: {
+          members: {
+            some: {
+              id: userData.id,
+            },
+          },
+        },
+      });
+      return {
+        status: 200,
+        data: groups,
+      };
+    } catch (error) {
+      console.log('xxx error ', error);
+      return { status: 500, message: 'Error fetching groups' };
+    }
   }
 
   update(id: number) {

@@ -55,4 +55,27 @@ export class GroupController {
       throw new HttpException('Error fetching Data', 500);
     }
   }
+
+  @Get('/user')
+  async findGroupsById(@Req() req: Request) {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException('Authorization Failed');
+    }
+
+    try {
+      const result = await this.groupService.findGroupById(user);
+
+      if (result.status !== 200) {
+        throw new HttpException('Error fetching Data', result.status);
+      }
+
+      return {
+        statusCode: result.status,
+        data: result.data,
+      };
+    } catch (error) {
+      throw new HttpException('Error fetching Data', 500);
+    }
+  }
 }
