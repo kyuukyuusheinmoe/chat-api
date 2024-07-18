@@ -43,16 +43,19 @@ export class MessageService {
     }
   }
 
-  async findByGroupId(groupId: number) {
+  async findByGroupId(user: UserDto, groupId: number) {
     try {
       const messages = await this.prismaService.message.findMany({
         where: {
           groupId,
         },
+        include: {
+          Sender: { select: { id: true, name: true } },
+        },
       });
       return {
         status: 200,
-        data: messages,
+        data: messages?.map((m) => ({ ...m, self: m.Sender.id === user.id })),
       };
     } catch (error) {
       return {

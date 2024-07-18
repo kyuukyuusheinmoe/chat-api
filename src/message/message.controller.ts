@@ -51,8 +51,12 @@ export class MessageController {
   }
 
   @Get(':groupId')
-  findByGroupId(@Param('groupId') groupId: string) {
-    return this.messageService.findByGroupId(+groupId);
+  findByGroupId(@Req() req: Request, @Param('groupId') groupId: string) {
+    const user = req['user'];
+    if (!user) {
+      throw new UnauthorizedException('Authorization Failed');
+    }
+    return this.messageService.findByGroupId(user, +groupId);
   }
 
   @Get(':id')
