@@ -99,6 +99,12 @@ export class AuthService {
         where: {
            email: userData.email
         },
+        select: {
+          id: true,
+          email: true,
+          name:true,
+          password: false,
+        },
       });
       try {
         if (!existingUser) {
@@ -106,7 +112,7 @@ export class AuthService {
         }
 
         const token = await this.jwtAuthService.createToken({ id: existingUser.id, email: existingUser.email, name: existingUser.name });
-        return { status: 200, message: 'Loggedin successfully', token };
+        return { status: 200, message: 'Loggedin successfully', data:existingUser, token };
       } catch (error) {
         return { status: 500, message: 'Error logging in' };
       }

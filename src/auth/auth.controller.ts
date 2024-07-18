@@ -34,7 +34,9 @@ export class AuthController {
     return {
       statusCode: result.status,
       message: result.message,
-      token: result.token
+      token: result.token,
+      data: result.data
+
     };
   }
 
