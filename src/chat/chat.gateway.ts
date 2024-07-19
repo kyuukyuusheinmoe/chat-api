@@ -39,7 +39,7 @@ export class ChatGateway
     const user = await this.getUserDataFromClient(client); // You need to implement this method to get userId
     if (user) {
       client.join(user.id);
-      this.users.set(`${user.id}`, client.id);
+      this.users.set(`${user.id}`, client);
       // for (const key of this.users.keys()) {
       //   this.logger.log(
       //     `xxx user ${key} user Size . ${this.users.size} Socket Client Size . ${sockets.size}`,
@@ -79,12 +79,15 @@ export class ChatGateway
       content,
       groupId: +groupId,
     });
-    // this.sendMessageToUser(receiverId, 'my message', content);
+    this.sendMessageToUser(receiverId, 'my_message', content);
   }
 
   sendMessageToUser(userId: string, event: string, message: string) {
     const client = this.users.get(userId);
+
     if (client) {
+      //userId need to be joined to client to emit the event to the specific user
+      client.join(userId);
       this.io.to(userId).emit(event, message);
     } else {
       console.log(`User ${userId} not connected`);
