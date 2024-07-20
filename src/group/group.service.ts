@@ -46,6 +46,7 @@ export class GroupService {
 
       const groupResult = await this.checkGroup(user, groupData);
 
+      console.log ('xxx groupResult ', groupResult)
       return groupResult;
     } catch (error) {
       console.log('xxx error ', error);
@@ -85,7 +86,9 @@ export class GroupService {
 
   async findAll() {
     try {
-      const groups = await this.prismaService.group.findMany({});
+      const groups = await this.prismaService.group.findMany({
+        include: { members: true },
+      });
       return {
         status: 200,
         data: groups,
