@@ -82,13 +82,20 @@ export class ChatGateway
 
     for (let i = 0; i < receiverIds.length; i++) {
       console.log('xxx receiver Id', receiverIds[i]);
-      this.sendMessageToUser(receiverIds[i], 'my_message', content, user);
+      this.sendMessageToUser(
+        receiverIds[i],
+        'my_message',
+        groupId,
+        content,
+        user,
+      );
     }
   }
 
   sendMessageToUser(
     receiverId: string,
     event: string,
+    groupId: number,
     message: string,
     sender: UserDto,
   ) {
@@ -101,6 +108,7 @@ export class ChatGateway
       client.join(`${receiverId}`);
       this.io.to(`${receiverId}`).emit(event, {
         ...sender,
+        groupId,
         content: message,
         self: +receiverId === sender.id,
       });
