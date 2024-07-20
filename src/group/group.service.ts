@@ -54,41 +54,33 @@ export class GroupService {
   }
 
   async checkGroup(user, groupData) {
-    const existedGroup = await this.prismaService.group.findFirst({
-      where: {
+    // const existedGroup = await this.prismaService.group.findFirst({
+    //   where: {
+    //     members: {
+    //       some: {
+    //         id: user.id,
+    //       },
+    //     },
+    //   },
+    //   include: { members: true },
+    // });
+
+    const group = await this.prismaService.group.create({
+      data: {
+        name: groupData.name,
+        createdAt: new Date(),
         members: {
-          some: {
-            id: user.id,
-          },
+          connect: [...groupData.members, user.id].map((id) => ({
+            id,
+          })),
         },
       },
-      include: { members: true },
     });
-
-    if (!existedGroup) {
-      const group = await this.prismaService.group.create({
-        data: {
-          name: groupData.name,
-          createdAt: new Date(),
-          members: {
-            connect: [...groupData.members, user.id].map((id) => ({
-              id,
-            })),
-          },
-        },
-      });
-      return {
-        status: 201,
-        message: 'Group created successfully',
-        data: group,
-      };
-    } else {
-      return {
-        status: 201,
-        message: 'Group created successfully',
-        data: existedGroup,
-      };
-    }
+    return {
+      status: 201,
+      message: 'Group created successfully',
+      data: group,
+    };
   }
 
   async findAll() {
