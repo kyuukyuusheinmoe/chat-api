@@ -10,15 +10,17 @@
 
 ``` $ npm install```
 
-##### 3. Run Prisma migrate
+#### 3. Setup a local Postgres DB and replace the db url in envfile
+
+##### 4. Run Prisma migrate
 
 ``` $ npx prisma migrate dev ```
 
-##### 4. Generate Prisma Client in order to access the prisma
+##### 5. Generate Prisma Client in order to access the prisma
 
 ``` $ npx prisma migrate generate ```
 
-##### 5. Start the application in Port 3000
+##### 6. Start the application in Port 3000
 
 ``` $ npm run start ```
 
