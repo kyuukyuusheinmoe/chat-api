@@ -65,32 +65,47 @@ export class ChatGateway
   @SubscribeMessage('message')
   async handleMessage(
     @MessageBody()
-    data: string,
+    data: any,
     @ConnectedSocket() client: Socket,
   ) {
     console.log('xxx handleMessage data ', data, typeof data);
     // client.join(data.groupId);
     // this.io.to(data.groupId).emit('message', 'a new challenger approaches');
 
-    const [receiverId, content, groupId] = data.split(',');
+    const { groupId, content, receiverIds } = data;
 
     const user = await this.getUserDataFromClient(client);
     this.saveMessage(user, {
       content,
       groupId: +groupId,
     });
-    this.sendMessageToUser(receiverId, 'my_message', content);
+
+    for (let i = 0; i < receiverIds.length; i++) {
+      console.log('xxx receiver Id', receiverIds[i]);
+      this.sendMessageToUser(receiverIds[i], 'my_message', content, user);
+    }
   }
 
-  sendMessageToUser(userId: string, event: string, message: string) {
-    const client = this.users.get(userId);
+  sendMessageToUser(
+    receiverId: string,
+    event: string,
+    message: string,
+    sender: UserDto,
+  ) {
+    console.log('xxx sendMessageToUser ', receiverId, typeof receiverId, event);
+
+    const client = this.users.get(`${receiverId}`);
 
     if (client) {
-      //userId need to be joined to client to emit the event to the specific user
-      client.join(userId);
-      this.io.to(userId).emit(event, message);
+      //receiverId need to be joined to client to emit the event to the specific user
+      client.join(`${receiverId}`);
+      this.io.to(`${receiverId}`).emit(event, {
+        ...sender,
+        content: message,
+        self: +receiverId === sender.id,
+      });
     } else {
-      console.log(`User ${userId} not connected`);
+      console.log(`User ${receiverId} not connected`);
     }
   }
 
